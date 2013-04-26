@@ -1,0 +1,195 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Single page template</title> 
+	<link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+	<script src="jquery-1.7.2.min.js"></script>
+	<script src="jquery.mobile-1.2.0.min.js"></script>
+   	<script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/main.js"></script>
+	<script type="text/javascript" src="js/bdLocal.js"></script>
+	<script type="text/javascript">
+	//Creando tabla Currency
+	var db;
+	/*******************IMPORTACIÓN TABLA CURRENCY *******************************************************/
+	function creaTablaCurrency(tx) {
+	   try {
+ 			 tx.executeSql('DROP table IF EXISTS Currency');
+			 tx.executeSql('CREATE TABLE IF NOT EXISTS Currency(Id TEXT, Description TEXT, Rate DOUBLE, Active INTEGER)');
+			 //La Llenamos ...
+			 var url=server + "/AsyncActions.php?action=GETCURRENCIES_MOBILE&UserId=" + window.localStorage["userId"];
+			 $.ajax(
+			   {
+				async: false,
+				url: url,
+				type: 'POST',
+				error : function (data){
+					alert('Error de acceso:' + data.responseText); 
+				}, 
+				success: function (data) {
+					var res;
+					eval ('res = ' + data + ';');
+
+					var jsonData = JSON.parse(data);
+					for (var i in jsonData.CurrencyRoot) {
+						var currency = jsonData.CurrencyRoot[i];
+						var query='INSERT INTO Currency (Id,Description,Rate, Active) VALUES ("' + currency.Id + '","' + currency.Description + '","' + currency.Rate + '","' + currency.Active + '")';
+						tx.executeSql(query);
+						//tx.executeSql('INSERT INTO Currency (Id,Description,Rate, Active) VALUES ("EUR","EURO",1,1)');
+					}
+				}
+			 });
+		 }
+		 catch (err)
+		 {
+			 alert("err: " + err);
+		 }
+	}
+
+	function errorTC(err) {
+		// Esto se puede ir a un Log de Error diría el purista de la oficina, pero como este es un ejemplo pongo el MessageBox.Show :P
+		alert("Error processing SQL: Codigo: " + err.code + " Mensaje: "+err.message);
+	}
+
+	function successTC() {
+		alert("Importación de divisas correcta!");	
+	}
+	/*******************FIN IMPORTACIÓN TABLA CURRENCY *******************************************************/
+	//Creando tabla Departamentos de imputación
+	/*******************IMPORTACIÓN TABLA Departamentos *******************************************************/
+	function creaTablaDepartment(tx) {
+	    try {
+ 			 tx.executeSql('DROP table IF EXISTS Department');
+			 tx.executeSql('CREATE TABLE IF NOT EXISTS Department(Id TEXT, Description TEXT, Active INTEGER)');
+			 //La Llenamos ...
+			 $.ajax(
+			   {
+				async: false,
+				url: server + "/AsyncActions.php?action=GETDEPARTMENTS_MOBILE",
+				type: 'POST',
+				error : function (data){
+					alert('Error de acceso:' + data.responseText); 
+				}, 
+				success: function (data) {
+					var res;
+					eval ('res = ' + data + ';');
+					var jsonData = JSON.parse(data);
+					for (var i in jsonData.DepartmentRoot) {
+						var department = jsonData.DepartmentRoot[i];
+						tx.executeSql('INSERT INTO Department (Id,Description,Active) VALUES ("' + department.Id + '","' + department.Description + '","' + department.Active + '")');
+					}
+				}
+			 });
+		 }
+		 catch (err)
+		 {
+			 alert("err: " + err);
+		 }
+	}
+
+	function errorTD(err) {
+		// Esto se puede ir a un Log de Error diría el purista de la oficina, pero como este es un ejemplo pongo el MessageBox.Show :P
+		alert("Error processing SQL: Codigo: " + err.code + " Mensaje: "+err.message);
+	}
+
+	function successTD() {
+		alert("Importación de departamentos correcta!");	
+	}
+	/*******************FIN IMPORTACIÓN TABLA Departamentos *******************************************************/
+	/*******************IMPORTACIÓN TABLA Tipos de Gastos (Expenses)***********************************************/
+	function creaTablaExpenseType(tx) {
+		 try {
+ 			 tx.executeSql('DROP table IF EXISTS ExpenseType');
+			 tx.executeSql('CREATE TABLE IF NOT EXISTS ExpenseType(ItemId INTEGER, ItemDescription TEXT, ItemGroupId INTEGER, ItemGroupDescription TEXT)');
+			 //La Llenamos ...
+			 $.ajax(
+			   {
+				async: false,
+				url: server + "/AsyncActions.php?action=GET_EXPENSETYPES",
+				type: 'POST',
+				error : function (data){
+					alert('Error de acceso:' + data.responseText); 
+				}, 
+				success: function (data) {
+					var res;
+					eval ('res = ' + data + ';');
+					var jsonData = JSON.parse(data);
+					for (var i in jsonData.ItemRoot) {
+						var expenseType = jsonData.ItemRoot[i];
+						var query='INSERT INTO ExpenseType (ItemId,ItemDescription, ItemGroupId, ItemGroupDescription) VALUES ("' + expenseType.ItemId + '","' + expenseType.ItemDescription + '","' + expenseType.ItemGroupId + '","' + expenseType.ItemGroupDescription + '")';
+						tx.executeSql(query);
+					}
+				}
+			 });
+		 }
+		 catch (err)
+		 {
+			 alert("err: " + err);
+		 }
+	}
+
+	function errorTET(err) {
+		// Esto se puede ir a un Log de Error diría el purista de la oficina, pero como este es un ejemplo pongo el MessageBox.Show :P
+		alert("Error processing SQL: Codigo: " + err.code + " Mensaje: "+err.message);
+	}
+
+	function successTET() {
+		alert("Importación de tipos de gastos correcta!");	
+	}
+	/*******************FIN IMPORTACIÓN TABLA CURRENCY *******************************************************/
+	/*******************IMPORTACIÓN PROJECTOS USUARIO *******************************************************/
+	function creaTablaProject(tx) {
+	   try {
+ 			 tx.executeSql('DROP table IF EXISTS Project');
+			 tx.executeSql('CREATE TABLE IF NOT EXISTS Project(Id INTEGER, Name TEXT, ProjectCode TEXT, Description TEXT, ProjectNormalPrice DOUBLE, ProjectExtraPrice DOUBLE, Active BIT)');
+			 //La Llenamos ...
+			 var url=server + "/AsyncActions.php?action=GETPROJECTS_MOBILE&UserId=" + window.localStorage["userId"];
+			 $.ajax(
+			   {
+				async: false,
+				url: url,
+				type: 'POST',
+				error : function (data){
+					alert('Error de acceso:' + data.responseText); 
+				}, 
+				success: function (data) {
+					var jsonData=JSON.parse(data); 
+					for (var i in jsonData.ProjectRoot) {
+						var project = jsonData.ProjectRoot[i];
+						var query='INSERT INTO Project (Id,Name,ProjectCode, Description,ProjectNormalPrice,ProjectExtraPrice,Active) VALUES ("' + project.Project_Id + '","' + project.Project_Name + '","' + project.Project_JiraCode + '","' + project.Project_Description + '",' + project.ProjectNormalPrice + ',' + project.ProjectExtraPrice + ',1)';
+						tx.executeSql(query);
+						//Volvemos al menú principal
+						$.mobile.changePage("main.html", {transition: "none"});
+					}
+
+				}
+			 });
+		 }
+		 catch (err)
+		 {
+			 alert("err: " + err);
+		 }
+	}
+
+	function errorP(err) {
+		// Esto se puede ir a un Log de Error diría el purista de la oficina, pero como este es un ejemplo pongo el MessageBox.Show :P
+		alert("Error processing SQL: Codigo: " + err.code + " Mensaje: "+err.message);
+	}
+
+	function successP() {
+		alert("Importación de proyectos correcta!");	
+	}
+
+	db = window.openDatabase("BTMobile.db3", "1.0", "Business Traveller Mobile", 30 * 1024);
+	db.transaction(creaTablaCurrency, errorTC, successTC);
+	db.transaction(creaTablaDepartment, errorTD, successTD);
+	db.transaction(creaTablaExpenseType, errorTET, successTET);
+	db.transaction(creaTablaProject, errorP, successP);
+	
+	</script>
+</head> 
+<body> 
+</body>
+</html>

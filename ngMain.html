@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Notas de Gastos. Opciones</title>
+	<link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+	<script src="jquery-1.7.2.min.js"></script>
+	<script src="jquery.mobile-1.2.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/main.js"></script>
+	<script type="text/javascript" src="js/bdLocal.js"></script>
+</head> 
+<body> 
+<div data-role="page" id="jqm-home" class="type-home">
+	<div data-role="content">
+		<div class="content-secondary">
+			<div id="jqm-homeheader">
+				<h1 id="jqm-logo"><img src="images/bt-logo.png" alt="BT Mobile" /></h1>
+				<p>Gesti&oacute;n de gastos para dispositivos m&oacute;viles</p>
+				<p id="jqm-version">Beta Release</p>
+			</div>
+		</div>	
+
+
+	<!--/content-primary-->	
+		<div class="content-primary">
+			<nav>
+				<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
+					<li data-role="list-divider">Opciones Notas de Gastos</li>
+					<li><a href="ngNew.html#Agregar" rel="external" data-ajax="false">Nueva Nota de Gastos</a></li>
+					<li><a href="ngNew.html#Listar" rel="external">Lista de Notas de Gastos</a></li>
+					<li><a href="ngNew.html#Validar">Validaci&oacute;n</a></li>
+					<li><a href="index.html">Volver</a></li>
+				</ul>
+			</nav>
+		</div>
+
+	</div>
+	
+	<div data-role="footer" class="footer-docs" data-theme="c">
+			<p>&copy; 2013 Astro Servicios Inform&aacute;ticos, S.L.</p>
+	</div>	
+	
+</div>
+</body>
+</html>

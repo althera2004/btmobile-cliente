@@ -1,0 +1,88 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Single page template</title> 
+	<link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+	<script src="jquery-1.7.2.min.js"></script>
+	<script src="jquery.mobile-1.2.0.min.js"></script>
+    	<script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/main.js"></script>
+	<script type="text/javascript" src="js/bdLocal.js"></script>
+	<script type="text/javascript">
+	$(document).bind('pageinit', function()
+	{
+		if (typeof window.localStorage["userId"] !=="undefined")
+		{
+			if (window.localStorage["userId"]!="")
+			{
+				$.mobile.changePage("main.html");
+			}
+		}
+		$("#submit").click(function(event)
+		{
+			event.preventDefault();
+			CreaDB();
+			//$.mobile.changePage("main.html");
+			var credentials = { username: $('#login_username').val(), password: $('#login_password').val(), company: $('#login_company').val() };
+			$.ajax(
+			{
+				url: "http://192.168.254.109/BTOS-Mobile/check.php",
+				data: credentials,
+				type: 'POST',
+				error : function (data){
+					$('#Title').html('Error de acceso:' + data.responseText); 
+				}, 
+				success: function (data) {
+					var res;
+					eval ('res = ' + data + ';');
+					if(res.success)
+					{
+						//alert('ok');
+						//store
+						window.localStorage["usuarioLogado"] = JSON.stringify(res);
+						window.localStorage["usuario"] = res.userName;       
+						window.localStorage["userId"] = res.userId;             
+						window.localStorage["company"] = res.company;             
+						$.mobile.changePage("main.html");
+					}
+					else
+					{
+							alert("Nombre de usuario y/o password incorrectos.");
+					}
+				}
+			});
+			
+		});
+	});
+	</script>
+</head> 
+<body onload="main()"> 
+<div data-role="page" id="inicio">
+	<div data-role="header"><!-- Inicia el Cabecera -->
+		<h1>BT Mobile. Autenticaci&oacute;n</h1>
+	</div><!-- Termina el Cabecera -->
+
+	<div data-role="content"><!-- Inicia el Contenido-->
+		<form method="PUT" action="http://192.168.254.109/BTOS-Mobile/check.php" data-ajax="false">
+			<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+			 <input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" name="login_username" id="login_username" value="" placeholder="Usuario:" type="text">
+			</div>
+			<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+			 <input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" name="login_password" id="login_password" value="" placeholder="Contrase&ntilde;a:" type="text">
+			</div>
+			<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+			 <input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" name="login_company" id="login_company" value="" placeholder="Empresa:" type="text">
+			</div>
+			
+			<button id="submit" type="button" data-theme="a">Enviar</button>
+		</form>
+	</div>
+		
+</div><!-- /page -->
+  <div data-role="footer" class="footer-docs" data-theme="c" data-position="fixed">
+			<p>&copy; 2013 Astro Servicios Inform&aacute;ticos, S.L.</p>
+	</div>	
+</body>
+</html>

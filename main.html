@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>jQuery Mobile: Demos and Documentation</title>
+	<link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+	<script src="jquery-1.7.2.min.js"></script>
+	<script src="jquery.mobile-1.2.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
+	<style type="text/css">
+		.ui-listview .ui-li-icon{top:-6px !important;left:-2px !important;max-height:48px;max-width:48px;}
+	</style>
+	<script type="text/javascript" src="js/bdLocal.js"></script>
+</head> 
+<body> 
+<div data-role="page" class="type-home">
+	<div data-role="content">
+		<ul data-role="listview" id="ngMain" data-inset="true">
+			<li data-role="list-divider">Añadir</li>
+			<li id="Trayecto"><a href="ngNew.html#Agregar?tipo=1" rel="external"><img src="./images/menuviaje.png" alt="Gastos en trayectos" class="ui-li-icon">Trayecto</a></li> 
+			<li id="Invita"><a href="ngNew.html#Agregar?tipo=2" rel="external"><img src="./images/menucomida.png" alt="Gastos en invitaciones a terceros" class="ui-li-icon">Invitaci&oacute;n</a></li>
+			<li id="Gastos"><a href="ngNew.html#Agregar?tipo=3" rel="external"><img src="./images/menutipogasto.png" alt="Otros tipos de gastos" class="ui-li-icon">Otros Gastos</a></li>
+			<li id="Listar"><a href="ngNew.html#Listar" rel="external"><img src="./images/ngListar.png" alt="Listado de gastos clasificados por tipo" class="ui-li-icon">Ver todas</a>
+			</li>
+		</ul>
+		<ul data-role="listview" data-inset="true">
+			<li data-role="list-divider">Notas de gastos</li>
+			<li data-theme="e">
+				<a href="ngNew.html#AgregarNotaGastos" rel="external"><img src="./images/ngCrear.png" alt="Notas de gastos" class="ui-li-icon">Crear</a>
+			</li>
+			<li data-theme="e">
+				<a href="ngNew.html#ListarNotasGastos" rel="external"><img src="./images/ngListar.png" alt="Listado de notas de gastos clasificados por tipo" class="ui-li-icon">Ver todas</a>
+			</li>
+			<li data-theme="e">
+				<a href="#athletics"><img src="./images/ngReportar.png" alt="Athletics" class="ui-li-icon">Reportar</a>
+			</li>
+		</ul>
+		<ul data-role="listview" data-inset="true">
+			<li data-role="list-divider">Configuraci&oacute;n</li>
+			<li data-theme="e">
+				<a href="sincronizar.html" rel="external"><img src="./images/ngCrear.png" alt="Sincronizaci&oacute;n con el servidor" class="ui-li-icon">Sincronizaci&oacute;n</a>
+			</li>
+			<li data-theme="e">
+				<a href="#athletics"><img src="./images/ngListar.png" alt="Perfil" class="ui-li-icon">Perfil</a>
+			</li>
+			<li data-theme="e">
+				<a href="sincronizar.html" rel="external"><img src="./images/ngReportar.png" alt="Salir de la aplicaci&oacute;n" class="ui-li-icon">Salir</a>
+			</li>
+		</ul>
+	</div>
+	<div data-role="footer" class="footer-docs" data-theme="c" data-position="fixed">
+			<p>&copy; 2013 Astro Servicios Inform&aacute;ticos, S.L.</p>
+	</div>	
+</div>
+</body>
+</html>

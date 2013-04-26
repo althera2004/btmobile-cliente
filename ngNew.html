@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>Notas de Gastos. Opciones</title>
+	<link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+	<script src="jquery-1.7.2.min.js"></script>
+	<script src="jquery.mobile-1.2.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/main.js"></script>
+	<script type="text/javascript" src="js/bdLocal.js"></script>
+	<style type="text/css">
+		#ListaGastoAnexado li{background-image:url(images/minus.png);background-repeat:no-repeat;background-position:0 50% 0 0;padding-left:60px}
+		#ListaGastosDisponibles li{background-image:url(images/add.png);background-repeat:no-repeat;background-position:0 50% 0 0;padding-left:60px}
+		.ui-li-divider{background-image:none !important;}
+	</style>	
+	<script type="text/javascript">
+	var tipo=getParameterByName("tipo");
+	function getParameterByName(name)
+	{
+		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+		var regexS = "[\\?&]"+name+"=([^&#]*)";
+		var regex = new RegExp( regexS );
+		var results = regex.exec( window.location.href );
+		if( results == null )
+			return "";
+		else
+			return decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+	function calculaImporteTrayecto()
+	{
+		var importeXkm=$('#txtImporteKm').val();
+		var km=$('#txtKm').val();
+		$('#txtImporte').val(importeXkm * km);
+	}
+
+	$("#Agregar").die("pageinit"); 
+	$(document).on('pageinit', '#Agregar', function()
+		{
+			$.mobile.selectmenu.prototype.options.nativeMenu = false;
+			$.mobile.selectmenu.prototype.options.hidePlaceholderMenuItems = false;
+			//Eliminamos efectos de transiciones
+			$.mobile.page.prototype.options.addBackBtn = true;
+			$.mobile.defaultPageTransition = 'none';
+			$.mobile.useFastClick = false;
+       	    CurrencyList();
+			//Por defecto, cargamos los tipos de gasto genéricos
+			visualiza(tipo);
+		});
+	$(document).delegate("#AgregarNotaGastos", "pageshow", function() {
+	   $('#txtFecha_Group').val(new Date().toJSON().slice(0,10));
+  	   ProjectList();
+	   DepartmentList();
+    });
+
+	$(document).delegate("#Listar", "pageshow", function() {
+		ItemId=0;
+		resetFields();
+       	Mostrar(1);
+    });
+
+	$(document).delegate("#ListarNotasGastos", "pageshow", function() {
+		ItemId=0;
+		//resetFields();
+       	Mostrar(3);
+    });
+	//Visualiza una lista con los gastos susceptibles a ser seleccionados (solo los gastos en estado borrador)
+	$(document).delegate("#ListarGastosDisponibles", "pageshow", function() {
+		ItemId=0;
+	   	Mostrar(5);
+    });
+	
+
+	$(document).delegate("#Agregar", "pageshow", function() {
+  	   $('#txtFecha').val(new Date().toJSON().slice(0,10));
+    });
+	
+	$("#ListaItem li").live('click', function(e) { 
+		ItemId=$(this).attr('id');
+		Mostrar(2);
+	});
+	$("#ListaNG li").live('click', function(e) { 
+		idNotaGastos=$(this).attr('id');
+		Mostrar(4);
+	});
+	$("#ListaGastosDisponibles li").live('click', function(e) { 
+		ItemId=$(this).attr('id');
+		addExpenseToNg(ItemId);
+	});
+	$("#ListaGastoAnexado li").live('click', function(e) { 
+		ItemId=$(this).attr('id');
+		ItemId=ItemId.substring(5);
+		removeExpenseToNg(ItemId);
+
+	});
+	
+	$('#txtKm').live('blur', function() {
+		calculaImporteTrayecto();
+	});
+	$('#txtImporteKm').live('blur', function() {
+		calculaImporteTrayecto();
+	});
+	
+	
+ </script>
+</head> 
+<body>
+<div data-role="page" id="Agregar">
+	<div data-role="header" data-position="fixed" data-theme="b"><!-- Inicia el Cabecera -->
+		<a data-role="button" data-rel="back" data-icon="arrow-l">Volver</a>
+		<h1>Nota de Gastos</h1>
+		<a href="index.html" data-theme="e" data-icon="delete" class="ui-btn-right">Logout</a>
+	<div>&nbsp;NG-0000 - <span style="color:#dd0;">Nueva</span></div>
+	
+</div><!-- Termina el Cabecera -->
+
+		<div data-role="content"><!-- Inicia el Contenido-->
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<img src="images/date.png" style="float:left;" id="txtFecha_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" id="txtFecha" value="" placeholder="Fecha:" type="date" style="width: 60%;">
+					<img src="images/haydoc.png" id="imgClip" name="imgClip" style="float:right;display:none"/>
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<img src="images/vendor.png" style="float:left;" id="txtDescription_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" id="txtDescription" value="" placeholder="Description:" type="text" style="width: 60%;">
+				</div>
+					<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<img src="images/txtKm_ico.png" style="float:left;" id="txtKm_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" id="txtKm" value="" placeholder="Km:" type="text" style="width: 60%;">
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<img src="images/txtImporteKm_ico.png" style="float:left;" id="txtImporteKm_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" id="txtImporteKm" value="" placeholder="Importe x Km" type="text" style="width: 60%;">
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+				<img src="images/importe.png" style="float:left;" id="txtImporte_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset"  id="txtImporte" value="" placeholder="Importe:" type="number" style="width: 60%;">
+				</div>
+				<div data-role="fieldcontain">
+				<img src="images/currency.png" style="float:left;" id="cmbCurrency_ico"/>
+				 <select id="cmbCurrency" style="width: 60%;"  data-native-menu="false">
+					 <option data-placeholder="true">Seleccionar divisa...</option>
+					 </select>
+				</div>
+				<div data-role="fieldcontain">
+				 <img src="images/expenseType.png" style="float:left;" id="cmbExpenseType_ico"/>
+				 <select id="cmbExpenseType" style="width: 60%;" data-native-menu="false">
+				  <option data-placeholder="true">Seleccionar tipo de gasto...</option>
+				 </select>
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<input  id="txtImage" value=""  type="hidden">
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<input  id="txtIdDeviceStatus" value=""  type="text">
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<input  id="txtIdExpenseServer" value=""  type="text">
+				</div>
+				
+		</div><!-- Termina el Contenido-->
+
+		<div data-role="footer" data-position="fixed"><!-- Inicia el Pie -->
+				<div data-role="navbar" data-theme="c" id="botonera" name="botonera" data-position="fixed">
+						<ul>
+							<li><a href="#"><img id="save"  data-theme="B" src="images/save.png" onclick="Agregar(1)"/></a></li>
+							<li><a href="#"><img id="delete" src="images/borrar.png" onclick="BorrarItem()"/></a></li>
+							<li><a href="#"><img id ="back" src="images/home.png" onclick="Agregar(1)"/></a></li>
+							<li><a href="#"><img id="capture" src="images/camara.png" onclick="captureImage()"/></a></li>
+						</ul>
+					</div><!-- /navbar -->
+						
+				</div><!-- Termina el Pie -->
+</div><!-- /page -->
+<div data-role="page" id="Listar">
+	<div data-role="header"><!-- Inicia el Cabecera -->
+		<h1>Listado de Gastos</h1>
+	</div><!-- Termina el Cabecera -->
+
+	<div data-role="content"><!-- Inicia el Contenido-->
+		<ul data-role="listview" data-inset="true" data-filter="true" id="ListaItem" name="ListaItem">
+		</ul>
+	</div>
+	<div data-role="footer" data-position="fixed"><!-- Inicia el Pie -->
+		<a aria-disabled="false" href="#inicio">Volver</a>
+	</div><!-- Termina el Pie -->
+</div><!-- /page -->
+
+
+<div data-role="page" id="ListarNotasGastos">
+	<div data-role="header"><!-- Inicia el Cabecera -->
+		<h1>Listado de Notas de Gastos</h1>
+	</div><!-- Termina el Cabecera -->
+
+	<div data-role="content"><!-- Inicia el Contenido-->
+		<ul data-role="listview" data-inset="true" data-filter="true" id="ListaNG" name="ListaNG">
+		</ul>
+	</div>
+	<div data-role="footer" data-position="fixed"><!-- Inicia el Pie -->
+		<a aria-disabled="false" href="#inicio">Volver</a>
+	</div><!-- Termina el Pie -->
+</div><!-- /page -->
+
+<div data-role="page" id="ListarGastosDisponibles">
+	<div data-role="header"><!-- Inicia el Cabecera -->
+		<h1>Listado de gastos disponibles</h1>
+	</div><!-- Termina el Cabecera -->
+
+	<div data-role="content"><!-- Inicia el Contenido-->
+		<ul data-role="listview" data-inset="true" data-filter="true" id="ListaGastosDisponibles" name="ListaGastosDisponibles">
+		</ul>
+	</div>
+	<div data-role="footer" data-position="fixed"><!-- Inicia el Pie -->
+		<a aria-disabled="false" href="#inicio">Volver</a>
+	</div><!-- Termina el Pie -->
+</div><!-- /page -->
+
+<div data-role="page" id="AgregarNotaGastos">
+	<div data-role="header" data-position="fixed" data-theme="b"><!-- Inicia el Cabecera -->
+		<a data-role="button" data-rel="back" data-icon="arrow-l">Volver</a>
+		<h1>Nota de Gastos</h1>
+		<a href="#ListarGastosDisponibles" rel="external"><img id="validate" src="images/addExpense.png"/></a>
+		<!--<a href="index.html" data-theme="e" data-icon="delete" class="ui-btn-right">Logout</a>-->
+	<div>&nbsp;NG-0000 - <span style="color:#dd0;">Nueva</span></div>
+	
+</div><!-- Termina el Cabecera -->
+
+		<div data-role="content"><!-- Inicia el Contenido-->
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<img src="images/date.png" style="float:left;" id="txtFecha_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" id="txtFecha_Group" value="" placeholder="Fecha:" type="date" style="width: 60%;">
+					<img src="images/haydoc.png" id="imgClip" name="imgClip" style="float:right;display:none"/>
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<img src="images/name.png" style="float:left;" id="txtName_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" id="txtName_Group" value="" placeholder="Name:" type="text" style="width: 60%;">
+				</div>
+				<div class="ui-field-contain ui-body ui-br" data-role="fieldcontain">
+					<img src="images/vendor.png" style="float:left;" id="txtDescription_ico"/>
+					<input class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset" id="txtDescription_Group" value="" placeholder="Description:" type="text" style="width: 60%;">
+				</div>
+				<div data-role="fieldcontain">
+				 <img src="images/department.png" style="float:left;" id="cmbDepartment_ico"/>
+				 <select id="cmbDepartment" style="width: 60%;" data-native-menu="false">
+				  <option data-placeholder="true">Seleccionar departamento...</option>
+				 </select>
+				</div>
+				<div data-role="fieldcontain">
+				 <img src="images/project.png" style="float:left;" id="cmbProject_ico"/>
+				 <select id="cmbProject" style="width: 60%;" data-native-menu="false">
+				  <option data-placeholder="true">Seleccionar proyecto...</option>
+				 </select>
+				</div>
+				
+				
+					<div>
+
+				<ul data-role="listview" data-inset="true" data-filter="false" id="ListaGastoAnexado" name="ListaGastoAnexado">
+				</ul></div>
+			
+
+		</div><!-- Termina el Contenido-->
+
+		<div data-role="footer" data-position="fixed"><!-- Inicia el Pie -->
+				<div data-role="navbar" data-theme="c" id="botonera" name="botonera" data-position="fixed">
+						<ul>
+							<li><a href="#"><img id="save"  data-theme="B" src="images/save.png" onclick="Agregar(2)"/></a></li>
+							<li><a href="#"><img id="delete" src="images/borrar.png" onclick="BorrarNotaGastos()"/></a></li>
+							<li><a href="#"><img id="validate" src="images/validate.png" onclick="captureImage()"/></a></li>
+							<li><a href="#"><img id ="back" src="images/home.png" onclick="Agregar(2)"/></a></li>
+						</ul>
+					</div><!-- /navbar -->
+						
+				</div><!-- Termina el Pie -->
+</div><!-- /page -->
+
+
+
+</body>
+</html>
